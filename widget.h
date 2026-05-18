@@ -50,7 +50,6 @@ public:
     ~Widget() override;
 
     QThread SpeakerThread;
-    Speaker _speaker;
     QMediaDevices *m_devicesOut = nullptr;
     QScopedPointer<Speaker> m_Speaker;
     QScopedPointer<QAudioSink> m_audioOutput;
@@ -61,7 +60,7 @@ public:
     int nPos;
 
 public slots:
-    void closingSound();
+    void testSound();
 
 private slots:
     void on_btnStart_clicked();

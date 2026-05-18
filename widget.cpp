@@ -72,7 +72,7 @@ void Speaker::newTest(QByteArray bufferOut)
 
 qint64 Speaker::readData(char *data, qint64 len)
 {
-    qDebug() << "enter readdata..." << QThread::isMainThread();
+    qDebug() << "enter speaker readdata...os main? " << QThread::isMainThread();
     qint64 total = 0;
     if (!m_buffer.isEmpty()) {
         while (len - total > 0) {
@@ -83,7 +83,12 @@ qint64 Speaker::readData(char *data, qint64 len)
             qDebug() << "chunk..." << chunk << "pos> = " << m_pos ;
         }
     }
-    qDebug() << "is Main Thread in readData: " << QThread::isMainThread();
+    // qDebug() << "is Main Thread in readData: " << QThread::isMainThread();
+    // if(m_pos > 200000)
+    // {
+    //     emit halt();
+    // }
+    // qDebug() << "halt called>>>>>>>>";
     return total;
 }
 
@@ -120,11 +125,12 @@ Widget::Widget(QWidget *parent)
     FileLoader::ReadConfig();
     FileLoader::ReadLesson();
     FileLoader::GetRandomTestSet(gTestGroup[curLessonInt]);
-    //connect(m_Speaker,&Speaker::halt,this,&Widget::closingSound);
+    connect(m_Speaker.data(),&Speaker::halt,this,&Widget::testSound);
 }
 
 Widget::~Widget()
 {
+    SpeakerThread.terminate();
     delete ui;
 }
 
@@ -137,12 +143,16 @@ void Widget::do_Orientation(int)
     m_Speaker->start();
     m_audioOutput->stop();
     m_audioOutput->start(m_Speaker.data());
+    SpeakerThread.start();
 }
 
-void Widget::closingSound()
+void Widget::testSound()
 {
-    ui->lbStatus->setText("closing...");
+    qDebug() << "test Sound...";
+    SpeakerThread.exit();
+    SpeakerThread.start();
 }
+
 
 void Widget::initializeAudioOutput(const QAudioDevice &deviceInfo)
 {
@@ -173,21 +183,20 @@ void Widget::on_btnStart_clicked()
     files.GetFileList(tonicNote);
     nPos = 0;
     m_Speaker->moveToThread(&SpeakerThread);
-    SpeakerThread.start();
     do_Orientation(nPos);
     nPos++;
 }
 
-
 void Widget::on_btnStop_clicked()
 {
-    qDebug() << "stoped...";
-    ui->lbStatus->setText("stoped...");
+    qDebug() << "stopped...";
+    ui->lbStatus->setText("halt called...");
 }
 
 
 void Widget::on_btnNext_clicked()
 {
+    ui->lbStatus->setText("Next...");
     do_Orientation(nPos);
     nPos++;
 }
