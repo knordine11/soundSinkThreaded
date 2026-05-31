@@ -27,9 +27,6 @@ public:
     qint64 m_pos = 0;
     QByteArray m_buffer;
 
-signals:
-    void halt();
-
 public slots:
     void startSound();
     void stopSound();
@@ -59,13 +56,15 @@ public:
     int tonicNote;
     int nPos;
 
+signals:
+    void halt();
+
 public slots:
     void testSound();
 
 private slots:
     void on_btnStart_clicked();
     void on_btnStop_clicked();
-
     void on_btnNext_clicked();
 
 private:

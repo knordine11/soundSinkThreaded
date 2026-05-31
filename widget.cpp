@@ -125,7 +125,7 @@ Widget::Widget(QWidget *parent)
     FileLoader::ReadConfig();
     FileLoader::ReadLesson();
     FileLoader::GetRandomTestSet(gTestGroup[curLessonInt]);
-    connect(m_Speaker.data(),&Speaker::halt,this,&Widget::testSound);
+    connect(this,&Widget::halt,this,&Widget::testSound, Qt::DirectConnection);
 }
 
 Widget::~Widget()
@@ -189,6 +189,7 @@ void Widget::on_btnStart_clicked()
 
 void Widget::on_btnStop_clicked()
 {
+    emit halt();
     qDebug() << "stopped...";
     ui->lbStatus->setText("halt called...");
 }
