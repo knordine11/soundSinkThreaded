@@ -51,8 +51,6 @@ public:
     QScopedPointer<Speaker> m_Speaker;
     QScopedPointer<QAudioSink> m_audioOutput;
     void do_Orientation(int);
-    int playedNote;
-    int kbPlayedNote;
     int tonicNote;
     int nPos;
 

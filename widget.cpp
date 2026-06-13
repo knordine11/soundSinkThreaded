@@ -10,39 +10,9 @@ int orientation [21] = {1,2,3,4,5,6,7,8,1,8,1,8,1,8,7,6,5,4,3,2,1};
 QMap<QString, int> tonic_map = {
     {"G3", 43}, {"A3", 45}, {"B3", 47}, {"C4", 48}, {"D4", 50}, {"A4", 52}, {"B4", 54}, {"C5", 55}
 };
-QMap<int, QString> tilesGoodBadMap = {
-    {0, "note0"}, {1, "note2"}, {2, "note4"}, {3, "note5"}, {4, "note7"}, {5, "note9"},
-    {6, "note11"}, {7, "note12"}
-};
-QMap<int, int> tileKbShift = {
-    {0, 0}, {1, 2}, {2, 4}, {3, 5}, {4, 7}, {5, 9}, {6, 11}, {7, 12}
-};
 Speaker speaker;
 QThread speakerThread;
-QThread microphoneThread;
-extern bool collectMicData;
-extern double rec_arr[];    // DEFINED AS DOUBLE FOR FFTW
-extern int rec_arr_cnt;
-extern int frame_start;
-extern int frame_size;
-extern int frame_end;
-extern int rec_arr_end;
-QByteArray bufferReadTo;
-QByteArray *currentAudioOut;
-QList<QByteArray> note_tone;
-int major_number_list[] = {0,2,4,5,7,9,11,12};
-int tonic_nunber;
-int audio_number_list;
-const QList <QString> note_letters = {"C", "C#", "D", "D#", "E",
-                                     "F", "F#", "G", "G#", "A", "A#", "B" };
-extern float note_acc;
-extern int noteC_no;
-extern int noteC_oct;
-extern float nn_l[12];
 extern QList<QByteArray> rawRecArrays;
-int accValue = 0;
-int displayDuration = 3000;
-
 
 Speaker::Speaker()
 {
@@ -72,7 +42,7 @@ void Speaker::newTest(QByteArray bufferOut)
 
 qint64 Speaker::readData(char *data, qint64 len)
 {
-    qDebug() << "enter speaker readdata...os main? " << QThread::isMainThread();
+    qDebug() << "enter speaker readdata...is on main? " << QThread::isMainThread();
     qint64 total = 0;
     if (!m_buffer.isEmpty()) {
         while (len - total > 0) {
@@ -82,13 +52,7 @@ qint64 Speaker::readData(char *data, qint64 len)
             total += chunk;
             qDebug() << "chunk..." << chunk << "pos> = " << m_pos ;
         }
-    }
-    // qDebug() << "is Main Thread in readData: " << QThread::isMainThread();
-    // if(m_pos > 200000)
-    // {
-    //     emit halt();
-    // }
-    // qDebug() << "halt called>>>>>>>>";
+    }    
     return total;
 }
 
@@ -138,8 +102,6 @@ void Widget::do_Orientation(int)
 {
     m_Speaker->newTest( rawRecArrays[orientation[nPos] - 1]);
     qDebug() << "orientation value: " << orientation[nPos] - 1;
-    playedNote = orientation[nPos] - 1;
-    kbPlayedNote = playedNote + tonicNote;
     m_Speaker->start();
     m_audioOutput->stop();
     m_audioOutput->start(m_Speaker.data());
@@ -171,10 +133,6 @@ void Widget::on_btnStart_clicked()
     qDebug() << "starting...";
     ui->lbStatus->setText("starting...");
     curLessonInt = currentlesson.toInt();
-    if (currentlesson != "1")
-
-    qDebug() << "starting to build array set";
-
     // get sound array set
     tonicNote = tonic_map[gNote[curLessonInt-1]];
     qDebug() << tonicNote;
@@ -194,11 +152,9 @@ void Widget::on_btnStop_clicked()
     ui->lbStatus->setText("halt called...");
 }
 
-
 void Widget::on_btnNext_clicked()
 {
     ui->lbStatus->setText("Next...");
     do_Orientation(nPos);
     nPos++;
 }
-
