@@ -102,8 +102,10 @@ void Widget::do_Orientation(int)
 {
     m_Speaker->newTest( rawRecArrays[orientation[nPos] - 1]);
     qDebug() << "orientation value: " << orientation[nPos] - 1;
+    m_Speaker->stop();
     m_Speaker->start();
     m_audioOutput->stop();
+
     m_audioOutput->start(m_Speaker.data());
     SpeakerThread.start();
 }
